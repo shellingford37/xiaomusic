@@ -9,6 +9,7 @@ import random
 import re
 import time
 import urllib.parse
+import requests
 from dataclasses import asdict
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
@@ -341,7 +342,7 @@ class XiaoMusic:
         if name not in self.all_music:
             return False
         url = self.all_music[name]
-        return url.startswith(("http://", "https://"))
+        return url.startswith(("http://", "https://" , "myhkw://"))
 
     # 获取歌曲播放时长，播放地址
     async def get_music_sec_url(self, name):
@@ -375,6 +376,20 @@ class XiaoMusic:
     def get_music_url(self, name):
         if self.is_web_music(name):
             url = self.all_music[name]
+            if url.startswith("myhkw://"):
+                path = url[8:]
+                part = path.split(';')
+                songId = part[0]
+                songType = part[1]
+                self.log.info(f"get_music_url myhkw music. name:{name}, songId:{songId}, songType:{songType}")
+                data = {'key': self.config.myhkw_key,'type':songType,'id':songId}
+                response = requests.post("https://myhkw.cn/open/music/url",data=data, timeout=5)
+                response.raise_for_status()  # 如果响应不是200，引发HTTPError异常
+                result = response.json()
+                if result['code'] != 1:
+                    url = ""
+                else:
+                    url = result['data']
             self.log.info(f"get_music_url web music. name:{name}, url:{url}")
             return url
 

@@ -11,7 +11,7 @@ echo "当前系统架构是：$arch"
 
 install_from_github() {
 	pkg=$1
-	wget https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/$pkg.tar.xz
+	wget https://ghp.ci/https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/$pkg.tar.xz
 	tar -xvJf $pkg.tar.xz
 	mkdir -p ffmpeg/bin
 	mv $pkg/bin/ffmpeg ffmpeg/bin/
